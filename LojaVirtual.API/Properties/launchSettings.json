@@ -5,7 +5,12 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DD_AGENT_HOST": "localhost",
+        "DD_ENV": "dev",
+        "DD_SERVICE": "LojaVirtual",
+        "DD_VERSION": "1.0.0",
+        "DD_TRACE_ENABLED": "true"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5296"
@@ -15,7 +20,14 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DD_AGENT_HOST": "localhost",
+        "DD_ENV": "dev",
+        "DD_SERVICE": "LojaVirtual",
+        "DD_VERSION": "1.0.0",
+        "DD_TRACE_ENABLED": "true",
+        "DD_LOGS_INJECTION": "true"
+
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7044;http://localhost:5296"
@@ -25,7 +37,13 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DD_AGENT_HOST": "localhost",
+        "DD_ENV": "dev",
+        "DD_SERVICE": "LojaVirtual",
+        "DD_VERSION": "1.0.0",
+        "DD_TRACE_ENABLED": "true",
+        "DD_LOGS_INJECTION": "true"
       }
     },
     "Container (Dockerfile)": {
@@ -34,7 +52,13 @@
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
       "environmentVariables": {
         "ASPNETCORE_HTTPS_PORTS": "8081",
-        "ASPNETCORE_HTTP_PORTS": "8080"
+        "ASPNETCORE_HTTP_PORTS": "8080",
+        "DD_AGENT_HOST": "localhost",
+        "DD_ENV": "dev",
+        "DD_SERVICE": "LojaVirtual",
+        "DD_VERSION": "1.0.0",
+        "DD_TRACE_ENABLED": "true",
+        "DD_LOGS_INJECTION": "true"
       },
       "publishAllPorts": true,
       "useSSL": true

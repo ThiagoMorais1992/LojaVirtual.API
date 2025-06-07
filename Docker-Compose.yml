@@ -1,0 +1,29 @@
+version: "3.9"
+services:
+  web:
+    build:
+      context: ./
+      dockerfile: ./LojaVirtual.API/Dockerfile
+    ports:
+      - "8000:80"
+    depends_on:
+      - datadog-agent
+    environment:
+      DD_ENV: "core-local"
+      DD_SERVICE: "LojaVirtual.API"
+      DD_VERSION: "1.0.0"
+      DD_AGENT_HOST: "datadog-agent"
+      DD_TRACE_ROUTE_TEMPLATE_RESOURCE_NAMES_ENABLED: "true"
+      DD_RUNTIME_METRICS_ENABLED: "true"
+  datadog-agent:
+    image: "gcr.io/datadoghq/agent:latest"
+    environment:
+      DD_APM_ENABLED: "true"
+      DD_APM_NON_LOCAL_TRAFFIC: "true"
+      DD_DOGSTATSD_NON_LOCAL_TRAFFIC: "true"
+      DD_API_KEY: "b0c39528e6c3502dcc29609ad0e01d11"
+      DD_HOSTNAME: "LojaVirtual.API"
+      DD_SITE: "us5.datadoghq.com"
+      DD_APM_INSTRUMENTATION_ENABLED: host 
+      DD_ENV: dev 
+      DD_APM_INSTRUMENTATION_LIBRARIES: java:1,python:3,js:5,php:1,dotnet:3 bash -c "$(curl -L https://install.datadoghq.com/scripts/install_script_agent7.sh)"
