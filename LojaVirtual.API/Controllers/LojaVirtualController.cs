@@ -20,6 +20,12 @@ namespace LojaVirtual.API.Controllers
            var pedidos = _context.buscaPedidos(idPedido);
            return Ok(pedidos);
         }
+
+        //[HttpGet(Name = "HealthCheck")]
+        //public IActionResult HealthCheck()
+        //{
+        //    return Ok("A aplicação está rodando e girando e rodando");
+        //}
         //public IActionResult Index()
         //{
         //    return View();

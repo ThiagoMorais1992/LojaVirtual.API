@@ -6,8 +6,6 @@ USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
-EXPOSE 80
-EXPOSE 443
 
 # Esta fase é usada para compilar o projeto de serviço
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
@@ -17,13 +15,16 @@ RUN set -ex \
   && TRACER_VERSION=$(curl -s https://api.github.com/repos/DataDog/dd-trace-dotnet/releases/latest | grep tag_name | cut -d '"' -f 4 | cut -c2-) \
   && curl -Lo /tmp/datadog-dotnet-apm.deb https://github.com/DataDog/dd-trace-dotnet/releases/download/v${TRACER_VERSION}/datadog-dotnet-apm_${TRACER_VERSION}_amd64.deb
 
-ARG BUILD_CONFIGURATION=Release
+
 WORKDIR /src
-COPY ["LojaVirtual.API/LojaVirtual.API.csproj", "LojaVirtual.API/"]
-RUN dotnet restore "./LojaVirtual.API/LojaVirtual.API.csproj"
+# Instala o Git
+RUN apt-get update && apt-get install -y git
+
+COPY ["LojaVirtual.API.csproj", "LojaVirtual.API/"]
+WORKDIR /src/LojaVirtual.API
+RUN dotnet restore "LojaVirtual.API.csproj"
 COPY . .
-WORKDIR "/src/LojaVirtual.API"
-RUN dotnet build "./LojaVirtual.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "LojaVirtual.API.csproj" -c Release -o /app/build
 
 # Esta fase é usada para publicar o projeto de serviço a ser copiado para a fase final
 FROM build AS publish
