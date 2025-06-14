@@ -113,8 +113,8 @@ namespace LojaVirtual.API.Context
                     ).Distinct().ToList();
 
                     Console.WriteLine($"Pedido: {idPedido} recuperado com sucesso!");
-
-                    return pedidos;
+                        
+                    return pedidos;                   
                 }
             }
             catch (Exception ex)
@@ -122,7 +122,7 @@ namespace LojaVirtual.API.Context
                 Console.WriteLine($"Erro ao buscar Pedido: {idPedido} Erro: {ex.Message}");
             }
             return new List<Pedido>();
-        }       
+        }
     }
 }
 

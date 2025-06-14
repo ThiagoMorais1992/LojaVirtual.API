@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using LojaVirtual.API.Context;
 
-
 namespace LojaVirtual.API.Controllers
 {
     [ApiController]
@@ -9,23 +8,33 @@ namespace LojaVirtual.API.Controllers
     public class LojaVirtualController : Controller
     {
         private readonly DbContextMySql _context;
-        public LojaVirtualController(DbContextMySql context)
+        private readonly DbContextMongoDB _contextMongoDB;
+        public LojaVirtualController(DbContextMySql context, DbContextMongoDB contextMongoDB)
         {
             _context = context;
+            _contextMongoDB = contextMongoDB;
         }
 
-        [HttpGet(Name = "BuscaPedidos")]
+        [HttpGet("buscaPedidos/{idPedido}", Name = "BuscaPedidos")]
         public IActionResult buscaPedidos(int idPedido)
         {
-           var pedidos = _context.buscaPedidos(idPedido);
-           return Ok(pedidos);
+            var pedidos = _context.buscaPedidos(idPedido);
+            return Ok(pedidos);
         }
 
-        //[HttpGet(Name = "HealthCheck")]
-        //public IActionResult HealthCheck()
-        //{
-        //    return Ok("A aplicação está rodando e girando e rodando");
-        //}
+        [HttpGet("buscaPedidosMongo/{idPedido}", Name = "BuscaPedidosMongo")]
+        public IActionResult buscaPedidosMongo(int idPedido)
+        {
+            var pedidos = _contextMongoDB.BuscarPedido(idPedido);
+            return Ok(pedidos);
+        }
+
+        [HttpGet("healthcheck", Name = "HealthCheck")]
+        public IActionResult HealthCheck()
+        {
+            return Ok("A aplicação está rodando e girando e rodando");
+        }
+
         //public IActionResult Index()
         //{
         //    return View();

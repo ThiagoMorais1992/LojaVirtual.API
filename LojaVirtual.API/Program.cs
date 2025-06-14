@@ -8,6 +8,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<DbContextMySql>();
+builder.Services.AddScoped<DbContextMongoDB>();
 
 var app = builder.Build();
 

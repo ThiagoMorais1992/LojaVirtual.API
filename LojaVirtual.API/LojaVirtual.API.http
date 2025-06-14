@@ -1,10 +1,12 @@
 @LojaVirtual.API_HostAddress = http://localhost:5000
 
-GET {{LojaVirtual.API_HostAddress}}/LojaVirtual/
-Accept: application/json
+GET {{LojaVirtual.API_HostAddress}}/LojaVirtual/healthcheck
+accept: */*
 ###
 
-GET {{LojaVirtual.API_HostAddress}}/LojaVirtual?idPedido=1
+GET {{LojaVirtual.API_HostAddress}}/LojaVirtual/buscaPedidos/1
 Accept: application/json
 
-
+###
+GET {{LojaVirtual.API_HostAddress}}/LojaVirtual/buscaPedidosMongo/1
+Accept: application/json
