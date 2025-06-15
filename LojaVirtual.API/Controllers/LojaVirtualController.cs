@@ -7,10 +7,12 @@ namespace LojaVirtual.API.Controllers
     [Route("[controller]")]
     public class LojaVirtualController : Controller
     {
+        private readonly ILogger<LojaVirtualController> _logger;
         private readonly DbContextMySql _context;
         private readonly DbContextMongoDB _contextMongoDB;
-        public LojaVirtualController(DbContextMySql context, DbContextMongoDB contextMongoDB)
+        public LojaVirtualController(ILogger<LojaVirtualController> logger, DbContextMySql context, DbContextMongoDB contextMongoDB)
         {
+            _logger = logger;
             _context = context;
             _contextMongoDB = contextMongoDB;
         }

@@ -6,67 +6,12 @@ namespace LojaVirtual.API.Context
 {
     public class DbContextMySql
     {
+        private readonly ILogger<DbContextMySql> _logger;
         private readonly IConfiguration _configuration;
-        public DbContextMySql(IConfiguration configuration)
+        public DbContextMySql(ILogger<DbContextMySql> logger, IConfiguration configuration)
         {
+            _logger = logger;
             _configuration = configuration;
-        }
-
-        private MySqlConnection criaConexao()
-        {
-            MySqlConnection conn = new MySqlConnection(_configuration["ConnectionStrings:MySql"]);
-
-            try
-            {
-                conn.Open();
-                Console.WriteLine("Conexão aberta com sucesso!");
-                return conn;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Erro ao abrir a conexão: " + ex.Message);
-                return null;
-            }
-        }
-
-        private void fechaConexao(MySqlConnection conn)
-        {
-            if (conn != null && conn.State == System.Data.ConnectionState.Open)
-            {
-                try
-                {
-                    conn.Close();
-                    Console.WriteLine("Conexão fechada com sucesso!");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Erro ao fechar a conexão: " + ex.Message);
-                }
-            }
-        }
-
-        public Object executaComando(string sql)
-        {
-            using (MySqlConnection conn = criaConexao())
-            {
-                if (conn != null)
-                {
-                    using (MySqlCommand cmd = new MySqlCommand(sql, conn))
-                    {
-                        try
-                        {
-                            cmd.ExecuteNonQuery();
-                            Console.WriteLine("Comando executado com sucesso!");
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine("Erro ao executar o comando: " + ex.Message);
-                        }
-                    }
-                    fechaConexao(conn);
-                }
-            }
-            return new Pedido(); // Retorna um objeto Pedido vazio, pode ser ajustado conforme a necessidade
         }
 
         public List<Pedido> buscaPedidos(int idPedido)
@@ -112,14 +57,14 @@ namespace LojaVirtual.API.Context
 
                     ).Distinct().ToList();
 
-                    Console.WriteLine($"Pedido: {idPedido} recuperado com sucesso!");
+                    _logger.LogInformation("Pedido: {IdPedido} recuperado com sucesso!", idPedido);
                         
                     return pedidos;                   
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erro ao buscar Pedido: {idPedido} Erro: {ex.Message}");
+                _logger.LogError(ex, "Erro ao buscar Pedido: {IdPedido}", idPedido);
             }
             return new List<Pedido>();
         }

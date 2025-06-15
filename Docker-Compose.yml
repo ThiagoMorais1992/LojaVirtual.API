@@ -2,6 +2,20 @@ version: "3"  # Define a versão do Docker Compose
 
 services:  # Define os serviços que serão executados
 
+  lojavirtualapi:
+    image: lojavirtualapi:latest
+    container_name: lojavirtualapi
+    restart: on-failure
+    networks:
+      - RedeLoja
+    ports:
+      - "5000:8080"
+    environment:
+      - ELASTIC_APM_SERVER_URLS=http://apm:8200
+      - ELASTIC_APM_SERVICE_NAME=lojavirtualapi
+      - ELASTIC_APM_ENVIRONMENT=development
+      - ELASTICSEARCH_SSL_CERTIFICATE_VERIFICATION=false
+
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0  # Imagem do Elasticsearch
     container_name: elasticsearch  # Nome do container
@@ -22,7 +36,7 @@ services:  # Define os serviços que serão executados
     ports:
       - 9200:9200  # Mapeia a porta 9200 do container para a porta 9200 da máquina host (acesso ao Elasticsearch)
     networks: 
-      - observabilidade  # Define a rede para comunicação com outros serviços
+      - RedeLoja  # Define a rede para comunicação com outros serviços
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.17.0  # Imagem do Kibana
@@ -33,7 +47,7 @@ services:  # Define os serviços que serão executados
       ELASTICSEARCH_URL: http://elasticsearch:9200  # URL do Elasticsearch
       ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'  # Lista de hosts do Elasticsearch
     networks: 
-      - observabilidade  # Usa a mesma rede para comunicação com o Elasticsearch
+      - RedeLoja  # Usa a mesma rede para comunicação com o Elasticsearch
 
   metricbeat:
     image: docker.elastic.co/beats/metricbeat:7.17.0  # Imagem do Metricbeat para monitoramento de métricas
@@ -47,7 +61,7 @@ services:  # Define os serviços que serão executados
       - ./beats/metric/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml  # Arquivo de configuração do Metricbeat
     restart: on-failure  # Reinicia o container em caso de falha
     networks: 
-      - observabilidade  # Usa a rede "observabilidade"
+      - RedeLoja  # Usa a rede "observabilidade"
   
   heartbeat:
     image: docker.elastic.co/beats/heartbeat:7.17.0  # Imagem do Heartbeat para monitoramento de uptime
@@ -60,7 +74,7 @@ services:  # Define os serviços que serão executados
       - BEAT_STRICT_PERMS=false # Acessar as configurações sem restringir permissão de usuário
       # - BEAT_STRICT_PERMS=2 # Caso a configuração não suba os containers por conta de versão do docker
     networks: 
-      - observabilidade  # Usa a rede "observabilidade"
+      - RedeLoja  # Usa a rede "observabilidade"
 
   apm:
     image: docker.elastic.co/apm/apm-server-oss:7.17.0  # Imagem do APM Server para monitoramento de performance
@@ -75,8 +89,8 @@ services:  # Define os serviços que serão executados
       - "8200:8200"  # Mapeia a porta 8200 para o APM server
     restart: on-failure  # Reinicia o container em caso de falha
     networks: 
-      - observabilidade  # Usa a rede "observabilidade"
+      - RedeLoja  # Usa a rede "observabilidade"
 
 networks:
-  observabilidade:
+  RedeLoja:
     external: true  # Usa uma rede externa chamada "observabilidade" para que todos os serviços possam se comunicar
