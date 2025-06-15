@@ -1,6 +1,4 @@
-﻿using LojaVirtual.API.Controllers;
-using LojaVirtual.API.Entity;
-using Elastic.Apm;
+﻿using Elastic.Apm;
 using Elastic.Apm.Api;
 using MongoDB.Driver;
 

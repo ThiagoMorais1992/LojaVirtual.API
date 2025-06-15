@@ -1,6 +1,8 @@
 ﻿using MySql.Data.MySqlClient;
 using LojaVirtual.API.Entity;
 using Dapper;
+using Elastic.Apm;
+using Elastic.Apm.Api;
 
 namespace LojaVirtual.API.Context
 {
@@ -33,33 +35,48 @@ namespace LojaVirtual.API.Context
                         join clientes cli on (p.idcliente = cli.idclientes)
                         WHERE p.idpedidos = @idPedido";
 
-                    var pedidoDict = new Dictionary<int, Pedido>();
+                    var span = Agent.Tracer.CurrentTransaction?.StartSpan("MySQL Find Pedido", ApiConstants.TypeDb, ApiConstants.SubtypeMySql, ApiConstants.ActionQuery);
+                    
+                    try
+                    {
+                        var pedidoDict = new Dictionary<int, Pedido>();
 
-                    var pedidos = conn.Query<Pedido, Cliente, DetalhePedido, Produto, Pedido>(
-                        sql,
-                        (pedido, cliente, detalhe, produto) =>
-                        {
-                            if (!pedidoDict.TryGetValue(pedido.idpedidos, out var pedidoEntry))
+                        var pedidos = conn.Query<Pedido, Cliente, DetalhePedido, Produto, Pedido>(
+                            sql,
+                            (pedido, cliente, detalhe, produto) =>
                             {
-                                pedidoEntry = pedido;
-                                pedidoEntry.cliente = cliente;
-                                pedidoEntry.detalhes = new List<DetalhePedido>();
-                                pedidoDict.Add(pedidoEntry.idpedidos, pedidoEntry);
-                            }
+                                if (!pedidoDict.TryGetValue(pedido.idpedidos, out var pedidoEntry))
+                                {
+                                    pedidoEntry = pedido;
+                                    pedidoEntry.cliente = cliente;
+                                    pedidoEntry.detalhes = new List<DetalhePedido>();
+                                    pedidoDict.Add(pedidoEntry.idpedidos, pedidoEntry);
+                                }
 
-                            detalhe.produto = produto;
-                            pedidoEntry.detalhes.Add(detalhe);
+                                detalhe.produto = produto;
+                                pedidoEntry.detalhes.Add(detalhe);
 
-                            return pedidoEntry;
-                        },
-                        new { idPedido },
-                        splitOn: "idpedidos,nome,quantidade,idprodutos"
+                                return pedidoEntry;
+                            },
+                            new { idPedido },
+                            splitOn: "idpedidos,nome,quantidade,idprodutos"
 
-                    ).Distinct().ToList();
+                        ).Distinct().ToList();
 
-                    _logger.LogInformation("Pedido: {IdPedido} recuperado com sucesso!", idPedido);
+                        _logger.LogInformation("Pedido: {IdPedido} recuperado com sucesso!", idPedido);
                         
-                    return pedidos;                   
+                        return pedidos;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Erro ao buscar pedido com ID {IdPedido} no MongoDB", idPedido);
+                        span?.CaptureException(ex);
+                        throw;
+                    }
+                    finally
+                    {
+                        span?.End();
+                    }
                 }
             }
             catch (Exception ex)
