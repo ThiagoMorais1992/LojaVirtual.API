@@ -23,6 +23,13 @@ namespace LojaVirtual.API.Controllers
             var pedidos = _context.buscaPedidos(idPedido);
             return Ok(pedidos);
         }
+        
+        [HttpGet("buscaPedidos2/{idPedido}", Name = "BuscaPedidos2")]
+        public IActionResult buscaPedidos2(int idPedido)
+        {
+            var pedidos = _context.buscaPedidos2(idPedido);
+            return Ok(pedidos);
+        }
 
         [HttpGet("buscaPedidosMongo/{idPedido}", Name = "BuscaPedidosMongo")]
         public IActionResult buscaPedidosMongo(int idPedido)

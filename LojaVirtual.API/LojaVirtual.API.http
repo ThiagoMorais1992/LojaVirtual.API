@@ -8,5 +8,10 @@ GET {{LojaVirtual.API_HostAddress}}/LojaVirtual/buscaPedidos/1
 Accept: application/json
 
 ###
+GET {{LojaVirtual.API_HostAddress}}/LojaVirtual/buscaPedidos2/1
+Accept: application/json
+
+###
 GET {{LojaVirtual.API_HostAddress}}/LojaVirtual/buscaPedidosMongo/1
 Accept: application/json
+###
