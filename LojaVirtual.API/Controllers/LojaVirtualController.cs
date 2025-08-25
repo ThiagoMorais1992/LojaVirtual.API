@@ -29,13 +29,27 @@ namespace LojaVirtual.API.Controllers
         {
             var pedidos = _context.buscaPedidos2(idPedido);
             return Ok(pedidos);
-        }
+        }        
 
+        [HttpPost("InserirPedido", Name = "InserirPedido")]
+        public IActionResult InserirPedido([FromBody] Entity.Pedido pedido)
+        {
+            var idPedido = _context.inserePedido(pedido);
+            return Ok($"Pedido {idPedido} inserido com sucesso!");
+        }
+        
         [HttpGet("buscaPedidosMongo/{idPedido}", Name = "BuscaPedidosMongo")]
         public IActionResult buscaPedidosMongo(int idPedido)
         {
             var pedidos = _contextMongoDB.BuscarPedido(idPedido);
             return Ok(pedidos);
+        }
+
+        [HttpPost("InserirPedidoMongo", Name = "InserirPedidoMongo")]
+        public IActionResult InserirPedidoMongo([FromBody] PedidoMongo pedido)
+        {
+            var idPedido = _contextMongoDB.InserePedidoMongo(pedido);
+            return Ok($"Pedido {idPedido} inserido com sucesso!");
         }
 
         [HttpGet("healthcheck", Name = "HealthCheck")]

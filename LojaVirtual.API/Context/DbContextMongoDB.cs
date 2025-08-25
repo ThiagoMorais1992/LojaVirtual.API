@@ -9,15 +9,15 @@ namespace LojaVirtual.API.Context
         private readonly ILogger<DbContextMongoDB> _logger;
         private readonly IConfiguration _configuration;
         private readonly IMongoDatabase _database;
+        public IMongoCollection<PedidoMongo> Pedidos => _database.GetCollection<PedidoMongo>("Pedidos");
+      
         public DbContextMongoDB(ILogger<DbContextMongoDB> logger, IConfiguration configuration)
         {
             _logger = logger;
             _configuration = configuration;
             var client = new MongoClient(_configuration["ConnectionStrings:MongoDB"]);
             _database = client.GetDatabase("LojaVirtual_mdb");
-        }
-
-        public IMongoCollection<PedidoMongo> Pedidos => _database.GetCollection<PedidoMongo>("Pedidos");
+        }        
 
         public PedidoMongo BuscarPedido(int idPedido)
         {
@@ -32,6 +32,26 @@ namespace LojaVirtual.API.Context
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro ao buscar pedido com ID {IdPedido} no MongoDB", idPedido);
+                span?.CaptureException(ex);
+                throw;
+            }
+            finally
+            {
+                span?.End();
+            }
+        }
+        public int InserePedidoMongo(PedidoMongo pedidoMongo)
+        {
+            var span = Agent.Tracer.CurrentTransaction?.StartSpan("MongoDB Insert Pedido", ApiConstants.TypeDb, ApiConstants.SubTypeMongoDb, ApiConstants.ActionExec);
+            try
+            {
+                Pedidos.InsertOne(pedidoMongo);
+                _logger.LogInformation("Pedido inserido com ID {IdPedido} no MongoDB", pedidoMongo.Pedido.IdPedidos);
+                return pedidoMongo.Pedido.IdPedidos;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao inserir pedido com ID {IdPedido} no MongoDB", pedidoMongo.Pedido.IdPedidos);
                 span?.CaptureException(ex);
                 throw;
             }

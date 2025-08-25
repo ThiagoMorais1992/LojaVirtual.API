@@ -7,7 +7,7 @@ namespace LojaVirtual.API.Entity
         public int idpedidos { get; set; }
         public int idcliente { get; set; }
         public List<DetalhePedido> detalhes { get; set; }
-        public Cliente cliente { get; set; }
+        public Cliente? cliente { get; set; }
         public DateTime data { get; set; }
         public string situacao { get; set; }
     }

@@ -1,8 +1,9 @@
-﻿using MySql.Data.MySqlClient;
-using LojaVirtual.API.Entity;
-using Dapper;
+﻿using Dapper;
 using Elastic.Apm;
 using Elastic.Apm.Api;
+using LojaVirtual.API.Entity;
+using MySql.Data.MySqlClient;
+using System;
 
 namespace LojaVirtual.API.Context
 {
@@ -160,6 +161,64 @@ namespace LojaVirtual.API.Context
                 _logger.LogError(ex, "Erro ao buscar Pedido: {IdPedido}", idPedido);
             }
             return new List<Pedido>();
+        }
+
+        public int inserePedido(Pedido pedido)
+        {
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(_configuration["ConnectionStrings:MySql"]))
+                {
+                    conn.Open();
+                    using (var transaction = conn.BeginTransaction())
+                    {
+                        var span = Agent.Tracer.CurrentTransaction?.StartSpan("MySQL Insert Pedido", ApiConstants.TypeDb, ApiConstants.SubtypeMySql, ApiConstants.ActionExec);
+                        try
+                        {                           
+                            string sqlInsertPedido = @"INSERT INTO pedidos (idcliente, data, situacao) 
+                                                VALUES (@idcliente, @data, @situacao);
+                                                SELECT LAST_INSERT_ID();";
+                            int novoIdPedido = conn.ExecuteScalar<int>(sqlInsertPedido, new
+                            {
+                                idcliente = pedido.idcliente,
+                                data = pedido.data,
+                                situacao = pedido.situacao
+                            }, transaction);
+                            string sqlInsertDetalhe = @"INSERT INTO detalhe_pedido (idpedido, idproduto, quantidade, valor_unt) 
+                                                VALUES (@idpedido, @idproduto, @quantidade, @valor_unt);";
+                            foreach (var detalhe in pedido.detalhes)
+                            {
+                                conn.Execute(sqlInsertDetalhe, new
+                                {
+                                    idpedido = novoIdPedido,
+                                    idproduto = detalhe.produto.idprodutos,
+                                    quantidade = detalhe.quantidade,
+                                    valor_unt = detalhe.valor_unt
+                                }, transaction);
+                            }
+                            transaction.Commit();
+                            _logger.LogInformation("Pedido inserido com sucesso! ID: {IdPedido}", novoIdPedido);
+                            return novoIdPedido;
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            _logger.LogError(ex, "Erro ao inserir pedido no MySQL");
+                            span?.CaptureException(ex);
+                            throw;
+                        }
+                        finally
+                        {
+                            span?.End();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao inserir Pedido");
+            }
+            return 0;
         }
     }
 }

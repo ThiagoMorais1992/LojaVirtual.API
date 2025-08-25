@@ -7,7 +7,7 @@ public class PedidoMongo
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public string Id { get; set; }
+    public string? Id { get; set; }
 
     [BsonElement("pedido")]
     public PedidoM Pedido { get; set; }
