@@ -220,6 +220,50 @@ namespace LojaVirtual.API.Context
             }
             return 0;
         }
+        public int atualizaPedido(int idpedidos, string situacao)
+        {
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(_configuration["ConnectionStrings:MySql"]))
+                {
+                    var span = Agent.Tracer.CurrentTransaction?.StartSpan("MySQL Update Pedido", ApiConstants.TypeDb, ApiConstants.SubtypeMySql, ApiConstants.ActionExec);
+                    conn.Open();
+                    using (var transaction = conn.BeginTransaction())
+                    {                        
+                        try
+                        {
+                            string sqlUpdatePedido = @"UPDATE pedidos SET situacao = @situacao 
+                                                WHERE idpedidos = @idpedidos;";
+                            int linhasAfetadas = conn.Execute(sqlUpdatePedido, new
+                            {
+                                idpedidos = idpedidos,
+                                situacao = situacao
+                            }, transaction);
+                           
+                            transaction.Commit();
+                            _logger.LogInformation("Pedido atualizado com sucesso! ID: {idPedidos}", idpedidos);
+                            return linhasAfetadas;
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            _logger.LogError(ex, "Erro ao atualizar pedido {idPedidos} no MySQL",idpedidos);
+                            span?.CaptureException(ex);
+                            throw;
+                        }
+                        finally
+                        {
+                            span?.End();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao atualizar Pedido {idPedidos}", idpedidos);
+            }
+            return 0;
+        }
     }
 }
 

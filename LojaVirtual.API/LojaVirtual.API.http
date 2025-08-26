@@ -15,3 +15,10 @@ Accept: application/json
 GET {{LojaVirtual.API_HostAddress}}/LojaVirtual/buscaPedidosMongo/1
 Accept: application/json
 ###
+GET {{LojaVirtual.API_HostAddress}}/LojaVirtual/AtualizaPedido/1
+Accept: application/json
+"Aprovado"
+###
+PUT {{LojaVirtual.API_HostAddress}}/LojaVirtual/AtualizaPedidoMongo/1
+"Aprovado"
+###

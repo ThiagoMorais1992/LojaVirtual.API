@@ -60,5 +60,28 @@ namespace LojaVirtual.API.Context
                 span?.End();
             }
         }
+
+        public int AtualizaPedidoMongo(int idPedido, string situacao)
+        {
+            var span = Agent.Tracer.CurrentTransaction?.StartSpan("MongoDB Update Pedido", ApiConstants.TypeDb, ApiConstants.SubTypeMongoDb, ApiConstants.ActionExec);
+            try
+            {
+                var filtro = Builders<PedidoMongo>.Filter.Eq(p => p.Pedido.IdPedidos, idPedido);
+                var update = Builders<PedidoMongo>.Update.Set(p => p.Pedido.Situacao, situacao);
+                var resultado = Pedidos.UpdateOne(filtro, update);
+                _logger.LogInformation("Pedido atualizado com ID {IdPedido} no MongoDB", idPedido);
+                return (int)resultado.ModifiedCount;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao atualizar pedido com ID {IdPedido} no MongoDB", idPedido);
+                span?.CaptureException(ex);
+                throw;
+            }
+            finally
+            {
+                span?.End();
+            }
+        }
     }
 }

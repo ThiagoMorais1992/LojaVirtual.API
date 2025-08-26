@@ -37,7 +37,14 @@ namespace LojaVirtual.API.Controllers
             var idPedido = _context.inserePedido(pedido);
             return Ok($"Pedido {idPedido} inserido com sucesso!");
         }
-        
+
+        [HttpPut("AtualizaPedido/{idPedido}", Name = "AtualizaPedido")]
+        public IActionResult AtualizaPedido(int idPedido, [FromBody] string situacao)
+        {
+            var linhasAfetadas = _context.atualizaPedido(idPedido, situacao);
+            return Ok($"Pedido {idPedido} atualizado com sucesso! Linhas afetadas: {linhasAfetadas}");
+        }
+
         [HttpGet("buscaPedidosMongo/{idPedido}", Name = "BuscaPedidosMongo")]
         public IActionResult buscaPedidosMongo(int idPedido)
         {
@@ -52,15 +59,17 @@ namespace LojaVirtual.API.Controllers
             return Ok($"Pedido {idPedido} inserido com sucesso!");
         }
 
+        [HttpPut("AtualizaPedidoMongo/{idPedido}", Name = "AtualizaPedidoMongo")]
+        public IActionResult AtualizaPedidoMongo(int idPedido, [FromBody] string situacao)
+        {
+            var linhasAfetadas = _contextMongoDB.AtualizaPedidoMongo(idPedido, situacao);
+            return Ok($"Pedido {idPedido} atualizado com sucesso no MongoDB! Linhas afetadas: {linhasAfetadas}");
+        }
+
         [HttpGet("healthcheck", Name = "HealthCheck")]
         public IActionResult HealthCheck()
         {
             return Ok("A aplicação está rodando e girando e rodando");
         }
-
-        //public IActionResult Index()
-        //{
-        //    return View();
-        //}
     }
 }
